@@ -1,6 +1,6 @@
 import { RedisCacheService } from '@/database/redis/redisCache.service';
 import { jsonClient } from '@/services/jsonPlaceholdClient';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger, LoggerService } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
@@ -11,9 +11,11 @@ export class UsersService {
     @InjectRepository(User)
     private usersRepository: Repository<User>,
     private readonly redisCacheService: RedisCacheService,
+    @Inject(Logger) private readonly logger: LoggerService,
   ) {}
 
   async findUsersInRedis(): Promise<Array<User>> {
+    this.logger.error('redis cache');
     const users = await this.redisCacheService.get('users');
     return users && JSON.parse(users);
   }
