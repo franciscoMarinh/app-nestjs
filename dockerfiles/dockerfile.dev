@@ -1,0 +1,9 @@
+FROM node:alpine
+
+WORKDIR /usr/src/app
+COPY package*.json ./
+COPY . .
+RUN npm i
+EXPOSE 3000 5432 9229 ${PORT}
+
+CMD ["npm", "run", "start:debug"]
