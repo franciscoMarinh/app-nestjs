@@ -1,5 +1,5 @@
 import { RedisCacheService } from '@/database/redis/redisCache.service';
-import { jsonClient } from '@/services/jsonPlaceholdClient';
+import { jsonClient } from '@/commons/services/jsonPlaceholdClient';
 import {
   HttpException,
   Inject,
