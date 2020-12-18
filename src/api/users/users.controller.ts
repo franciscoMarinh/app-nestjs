@@ -7,7 +7,6 @@ export class UsersController {
 
   @Get('/')
   async findAll() {
-    const data = await this.userService.findAllUsers();
-    return data;
+    return this.userService.findAllUsers();
   }
 }

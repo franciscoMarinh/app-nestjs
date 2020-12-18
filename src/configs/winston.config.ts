@@ -3,6 +3,7 @@ import {
   WinstonModuleOptions,
 } from 'nest-winston';
 import * as winston from 'winston';
+import 'winston-daily-rotate-file';
 
 export const winstonConfig: WinstonModuleOptions = {
   levels: winston.config.npm.levels,
@@ -14,10 +15,13 @@ export const winstonConfig: WinstonModuleOptions = {
         nestWinstonModuleUtilities.format.nestLike(),
       ),
     }),
-    new winston.transports.File({
-      level: 'verbose',
-      filename: 'application.log',
+    new winston.transports.DailyRotateFile({
       dirname: 'logs',
+      filename: 'application-%DATE%.log',
+      datePattern: 'YYYY-MM-DD-HH',
+      zippedArchive: false,
+      maxSize: '20m',
+      maxFiles: '14d',
     }),
   ],
 };
