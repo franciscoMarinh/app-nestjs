@@ -1,15 +1,15 @@
 import { RedisCacheService } from '@/database/redis/redisCache.service';
-import { jsonApi } from '@/services/jsonPlaceholdApi';
+import { jsonClient } from '@/services/jsonPlaceholdClient';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './users.entity';
-import { UsersRepository } from './users.repository';
+import { Repository } from 'typeorm';
+import { User } from './user.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(UsersRepository)
-    private usersRepository: UsersRepository,
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
     private readonly redisCacheService: RedisCacheService,
   ) {}
 
@@ -19,7 +19,7 @@ export class UsersService {
   }
 
   async findUsersInJsonPlaceHold(): Promise<Array<User>> {
-    const users = await jsonApi.get<Array<User>>('/users');
+    const users = await jsonClient.get<Array<User>>('/users');
     return users.data;
   }
 

@@ -1,5 +1,5 @@
 import axios from 'axios';
 
-export const jsonApi = axios.create({
+export const jsonClient = axios.create({
   baseURL: 'https://jsonplaceholder.typicode.com',
 });
