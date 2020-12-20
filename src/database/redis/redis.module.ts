@@ -8,7 +8,7 @@ import { RedisCacheService } from './redisCache.service';
     CacheModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: async () => redisConfig,
+      useFactory: redisConfig,
     }),
   ],
   providers: [RedisCacheService],
