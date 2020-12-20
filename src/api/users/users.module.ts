@@ -3,10 +3,13 @@ import { Logger, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
-import { User } from './user.entity';
+import { User, AddressData, ContactDetail } from './entities';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User]), RedisCacheModule],
+  imports: [
+    TypeOrmModule.forFeature([User, AddressData, ContactDetail]),
+    RedisCacheModule,
+  ],
   controllers: [UsersController],
   providers: [UsersService, Logger],
 })

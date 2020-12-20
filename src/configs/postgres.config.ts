@@ -11,5 +11,6 @@ export const typeOrmConfig = async (
   password: configService.get('DB_PG_PASSWORD'),
   database: configService.get('DB_PG_SCHEMA'),
   entities: [__dirname + '../../**/*.entity.{js,ts}'],
-  synchronize: configService.get('NODE_ENV') === 'development',
+  // synchronize: configService.get('NODE_ENV') === 'development',
+  synchronize: true,
 });

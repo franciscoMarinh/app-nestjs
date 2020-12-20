@@ -1,26 +1,27 @@
 import { RedisCacheService } from '@/database/redis/redisCache.service';
 import { jsonClient } from '@/commons/services/jsonPlaceholdClient';
-import {
-  HttpException,
-  Inject,
-  Injectable,
-  Logger,
-  LoggerService,
-} from '@nestjs/common';
+import { Inject, Injectable, Logger, LoggerService } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from './user.entity';
+import { AddressData, ContactDetail, User } from './entities';
+import { IUser } from './user.interfaces';
+import { filterByName } from '@/commons/utils';
+import { IUserFields } from './users.interfaces';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    @InjectRepository(AddressData)
+    private addressDataRepository: Repository<AddressData>,
+    @InjectRepository(ContactDetail)
+    private contactDetailRepository: Repository<ContactDetail>,
     private readonly redisCacheService: RedisCacheService,
     @Inject(Logger) private readonly logger: LoggerService,
   ) {}
 
-  private async findUsersInRedis(): Promise<void | User[]> {
+  private async findUsersInRedis(): Promise<void | IUser[]> {
     try {
       const users = await this.redisCacheService.get('users');
       return users && JSON.parse(users);
@@ -30,12 +31,13 @@ export class UsersService {
         'userService',
         'Database',
       );
+      return;
     }
   }
 
-  private async findUsersInJsonPlaceHold(): Promise<void | User[]> {
+  private async findUsersInJsonPlaceHold(): Promise<void | IUser[]> {
     try {
-      const users = await jsonClient.get<Array<User>>('/users');
+      const users = await jsonClient.get<Array<IUser>>('/users');
       return users.data;
     } catch (error) {
       this.logger.error(
@@ -43,11 +45,12 @@ export class UsersService {
         'userService',
         'Database',
       );
+      return;
     }
   }
 
-  private async findAllUsersCached(): Promise<void | User[]> {
-    let users: Array<User> | void;
+  public async findAllUsers(): Promise<void | IUser[]> {
+    let users: IUser[] | void;
     users = await this.findUsersInRedis();
     if (!users) {
       users = await this.findUsersInJsonPlaceHold();
@@ -60,14 +63,60 @@ export class UsersService {
     return users;
   }
 
-  public async findAllUsers(): Promise<void | User[]> {
-    const users = await this.findAllUsersCached();
-    if (!users) {
-      throw new HttpException(
-        'Desculpe, houve um problema ao consultar os usuarios, Por favor tente novamente mais tarde.',
-        403,
+  public async saveDataUsers(): Promise<void | any> {
+    const users = await this.findAllUsers();
+    if (!users) return;
+
+    const { user, addressData, contactDetail } = users
+      .sort(filterByName)
+      .reduce(
+        (acc: IUserFields, user) => ({
+          addressData: [
+            ...acc.addressData,
+            {
+              city: user.address.city,
+              geo: JSON.stringify(user.address.geo),
+              street: user.address.street,
+              suite: user.address.suite,
+              zipcode: user.address.zipcode,
+              user,
+            },
+          ],
+          contactDetail: [
+            ...acc.contactDetail,
+            {
+              email: user.email,
+              phone: user.phone,
+              user,
+            },
+          ],
+          user: [
+            ...acc.user,
+            {
+              id: user.id,
+              name: user.name,
+              username: user.username,
+              website: user.website,
+            },
+          ],
+        }),
+        {
+          addressData: [],
+          contactDetail: [],
+          user: [],
+        },
       );
+
+    const promsiesToResolve = [
+      this.usersRepository.save(user),
+      this.addressDataRepository.save(addressData),
+      this.contactDetailRepository.save(contactDetail),
+    ];
+
+    try {
+      await Promise.all(promsiesToResolve);
+    } catch (error) {
+      throw error;
     }
-    return users;
   }
 }
