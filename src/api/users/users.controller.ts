@@ -1,4 +1,4 @@
-import { SuccessConstant } from '@/commons/constant';
+import { SuccessConstant } from '../../commons/constant';
 import { Controller, Get, HttpException } from '@nestjs/common';
 import { UsersService } from './users.service';
 
@@ -8,14 +8,14 @@ export class UsersController {
 
   @Get('/')
   async findAll() {
-    const users = await this.userService.findAllUsers();
-    if (!users) {
+    const data = await this.userService.findAllUsers();
+    if (!data) {
       throw new HttpException(
         'Desculpe, houve um problema ao consultar os usuarios, Por favor tente novamente mais tarde.',
         403,
       );
     }
-    return users;
+    return { data };
   }
 
   @Get('/save')

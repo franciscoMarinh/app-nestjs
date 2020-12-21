@@ -1,4 +1,4 @@
-import { RedisCacheModule } from '@/database/redis/redis.module';
+import { RedisCacheModule } from '../../database/redis/redis.module';
 import { Logger, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersController } from './users.controller';

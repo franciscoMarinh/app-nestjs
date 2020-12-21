@@ -1,12 +1,11 @@
-import { RedisCacheService } from '@/database/redis/redisCache.service';
-import { jsonClient } from '@/commons/services/jsonPlaceholdClient';
+import { RedisCacheService } from '../../database/redis/redisCache.service';
+import { jsonClient } from '../../commons/services/jsonPlaceholdClient';
 import { Inject, Injectable, Logger, LoggerService } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AddressData, ContactDetail, User } from './entities';
-import { IUser } from './user.interfaces';
-import { filterByName } from '@/commons/utils';
-import { IUserFields } from './users.interfaces';
+import { IUser, IUserFields } from './users.interfaces';
+import { filterByName } from '../../commons/utils';
 
 @Injectable()
 export class UsersService {
