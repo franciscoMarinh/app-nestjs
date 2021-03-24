@@ -1,5 +1,5 @@
 import { RedisCacheService } from '../../database/redis/redisCache.service';
-import { jsonClient } from '../../commons/services/jsonPlaceholdClient';
+import JsonClient from '../../commons/services/jsonPlaceholdClient';
 import { Inject, Injectable, Logger, LoggerService } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -18,9 +18,10 @@ export class UsersService {
     private contactDetailRepository: Repository<ContactDetail>,
     private readonly redisCacheService: RedisCacheService,
     @Inject(Logger) private readonly logger: LoggerService,
+    @Inject(JsonClient) private readonly jsonClient: JsonClient,
   ) {}
 
-  private async findUsersInRedis(): Promise<void | IUser[]> {
+  public async findUsersInRedis(): Promise<void | IUser[]> {
     try {
       const users = await this.redisCacheService.get('users');
       return users && JSON.parse(users);
@@ -34,9 +35,9 @@ export class UsersService {
     }
   }
 
-  private async findUsersInJsonPlaceHold(): Promise<void | IUser[]> {
+  public async findUsersInJsonPlaceHold(): Promise<void | IUser[]> {
     try {
-      const users = await jsonClient.get<Array<IUser>>('/users');
+      const users = await this.jsonClient.api.get<Array<IUser>>('/users');
       return users.data;
     } catch (error) {
       this.logger.error(

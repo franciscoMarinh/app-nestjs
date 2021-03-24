@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { User, AddressData, ContactDetail } from './entities';
+import JsonClient from '@/commons/services/jsonPlaceholdClient';
 
 @Module({
   imports: [
@@ -11,6 +12,6 @@ import { User, AddressData, ContactDetail } from './entities';
     RedisCacheModule,
   ],
   controllers: [UsersController],
-  providers: [UsersService, Logger],
+  providers: [UsersService, Logger, JsonClient],
 })
 export class UsersModule {}

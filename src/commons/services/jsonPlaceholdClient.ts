@@ -1,5 +1,12 @@
-import axios from 'axios';
+import axios, { AxiosInstance } from 'axios';
 
-export const jsonClient = axios.create({
-  baseURL: 'https://jsonplaceholder.typicode.com',
-});
+class JsonClient {
+  public api: AxiosInstance;
+
+  constructor() {
+    this.api = axios.create({
+      baseURL: 'https://jsonplaceholder.typicode.com',
+    });
+  }
+}
+export default JsonClient;
